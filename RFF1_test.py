@@ -27,7 +27,7 @@ print mse_rffs
 print mse_pre_rffs
  
  
-DD = np.arange(10,500,10) 
+DD = np.arange(2,100,2) 
  
      
 fig = plt.figure()

@@ -55,24 +55,24 @@ def err_rff(xs,ys,xt,yt,sgma = 1.0,lamda = 0.1,D = 50):
 def err_computing(nlp,nn,ni,D_ftr,sgma0,lamda0): 
 ### the error for ridge regression
     err_pres = np.zeros(nlp)
-
+ 
 ### the error for the rff
     err_rffs = np.zeros(nlp)
- 
+  
 ### the error difference for the two regression
     err_pre_rffs = np.zeros(nlp)
-
-
+ 
+ 
     for num in range(nlp):
 ### generating data
         xs,ys,xt,yt =dat_gen(nn,ni)
-
+ 
 ### run xvalidation
         kernel = GaussianKernel(sgma0)
         lamda_pre, width_pre = kernel.xvalidate(xs,ys,method="ridge_regress")
         kernel.rff_generate(D_ftr)
         lamda_rff,width_rff = kernel.xvalidate(xs,ys,method="ridge_regress_rff")
-   
+    
 ### perform ridge regression
         y_pre, err_pre0 = err_pre(xs,ys,xt,yt,width_pre,lamda_pre)
         err_pres[num] = err_pre0
@@ -80,18 +80,18 @@ def err_computing(nlp,nn,ni,D_ftr,sgma0,lamda0):
         y_rff, err_rff0 = err_rff(xs,ys,xt,yt,width_rff,lamda_rff,D_ftr)
         err_rffs[num] = err_rff0
 ### comparing the difference between two predictions        
-        err_pre_rffs[num] = np.linalg.norm(y_pre-y_rff)**2
+        err_pre_rffs[num] = np.linalg.norm(y_pre-y_rff)**2/ni
+   
   
- 
 ### the mean square error for ridge regression
     mse_pre = np.mean(err_pres)
- 
+  
 ### the mean square error for rff
     mse_rff = np.mean(err_rffs)
- 
+  
 ### the mean square error for the difference between ridge and rff
     mse_pre_rff = np.mean(err_pre_rffs)
-    
+     
     results = np.array([mse_pre,mse_rff,mse_pre_rff])
     return results
 
@@ -106,38 +106,54 @@ def err_processes(processes,nlp,nn,ni,D_ft,sgma0,lamda0):
 
 ### parameters
 ### number of training data
-n_tr = 1000
+n_tr = 5000
  
 ### number of testing data
-n_tt = 500
-
-
+n_tt = 1000
 
  
 ### number of simulations
 n_sm = 10
  
 ### feature numbers
-DD = np.arange(10,500,10)
+DD = np.arange(2,100,2)
  
 ### initial width
 width0 = 1.0
  
 ### initial regularization parameter
 lmda0 = 0.1
- 
 
- 
-### number of processes
+
+# number of processes
 pross = 10
- 
+  
 err_results = []
 err_results = np.array(err_processes(pross,n_sm,n_tr,n_tt,DD,width0,lmda0))
-
  
+  
 mse_pres = err_results[:,0]
 mse_rff = err_results[:,1]
 mse_pre_rff = err_results[:,2]
+
+
+
+# fig = plt.figure()
+#    
+# ax1 = fig.add_subplot(2,1,1) 
+# axes = plt.gca()
+# plt.plot(DD,np.repeat(np.mean(mse_pres),len(DD)),c='b')
+# plt.plot(DD, mse_rff)
+# plt.xlabel("Number of Features")
+# plt.ylabel("The Mean Square Error")
+# plt.title("Mean Square Errors for Ridge Regression and RFF")
+#    
+# ax2 = fig.add_subplot(2,1,2)
+# plt.plot(DD,mse_pre_rff,c='b')
+# plt.xlabel("Number of Features")
+# plt.ylabel("The Error Difference")
+# plt.title("The Error Difference between Ridge and RFF")
+# plt.show()  
   
 ####################################################################
 ### save the computation
@@ -145,14 +161,40 @@ mse_pre_rff = err_results[:,2]
 pickle_out1 = open("ridge error","wb")
 pickle_out2 = open ("rff error", "wb")
 pickle_out3 = open("ridge_rff error","wb")
-   
+    
 pickle.dump(mse_pres, pickle_out1)
 pickle.dump(mse_rff,pickle_out2)
 pickle.dump(mse_pre_rff,pickle_out3)
-   
+    
 pickle_out1.close()
 pickle_out2.close()
 pickle_out3.close()
 
-
-
+# 
+# D_ftr = 20
+#  
+# x_tr,y_tr,x_tt,y_tt = dat_gen(n_tr,n_tt)
+# 
+# kernel = GaussianKernel(width0)
+# lamda_pre, width_pre = kernel.xvalidate(x_tr,y_tr,method="ridge_regress")
+# kernel.rff_generate(D_ftr)
+# lamda_rff,width_rff = kernel.xvalidate(x_tr,y_tr,method="ridge_regress_rff")
+#  
+# print lamda_pre
+# print width_pre
+# print lamda_rff
+# print width_rff    
+#  
+#  
+# y_pre, err_pres = err_pre(x_tr,y_tr,x_tt,y_tt,width_pre,lamda_pre)
+# y_rff,err_rffs = err_rff(x_tr,y_tr,x_tt,y_tt,width_rff,lamda_rff,D_ftr)
+#  
+# print err_pres
+# print err_rffs
+# 
+# 
+# fig = plt.figure()
+# plt.plot(x_tt, y_tt)
+# plt.plot(x_tt,y_pre,"g")
+# plt.plot(x_tt,y_rff,"r")
+# plt.show()
