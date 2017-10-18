@@ -106,14 +106,14 @@ def err_processes(processes,nlp,nn,ni,D_ft,sgma0,lamda0):
 
 ### parameters
 ### number of training data
-n_tr = 5000
+n_tr = 1000
  
 ### number of testing data
-n_tt = 1000
+n_tt = 500
 
  
 ### number of simulations
-n_sm = 10
+n_sm = 15
  
 ### feature numbers
 DD = np.arange(2,100,2)
